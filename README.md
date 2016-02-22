@@ -11,5 +11,6 @@ One ini file for one customer. You can create another ini file based on **moe.in
 This **pack.sh** file will update your owncloud app to the latest according to **moe.ini** file.
 
 #  Executing script
+Sample:
 
     ./pack.sh --config moe.ini -v
