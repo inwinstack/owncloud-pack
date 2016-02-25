@@ -78,7 +78,6 @@ function appupdate(){
       cd $workspace
       echo
       logln "Updating app: $App ... done"
-      #break
     done
     echo "============================================================================"
 }
@@ -97,8 +96,7 @@ function appclone(){
       echo "----------------------------------------------------------------------------"
       branch=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/branch/{print $2;exit}' $CONFIGFILE)
       git_url=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/git_url/{print $2;exit}' $CONFIGFILE)
-      match=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/match/{print $2;exit}' $CONFIGFILE)
-      sourcename=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/sourcename/{print $2;exit}' $CONFIGFILE)
+      appname=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
       echo -e "App: $App\tUrl: $git_url\n"
       cd $workspace/owncloud/apps/
       
@@ -108,25 +106,14 @@ function appclone(){
           echo -e "$App does not exist.\n"
 	  log "cloning app: $App ..."
 	  echo
-	  git clone $git_url
-	  
-	  if [ "$match" == "Yes" ]; then
-	      echo
-	      echo -e "$App does not need to change name.\n"
-	  elif [ "$match" == "No" ]; then
-	      mv $sourcename $App
-              echo
-	      echo -e "Change name from $sourcename to $App\n"
-	  fi
-
-	  cd $App
+	  git clone $git_url $appname
+	  cd $appname
 	  git checkout $branch
 	  echo
 	  logln "cloning app: $App ... done"
       fi
 
       cd $workspace
-      #break
     done
     echo "============================================================================"
 }
@@ -159,22 +146,21 @@ function owncloudcore(){
           echo -e "$corename does not exist.\n"
           log "cloning core: $corename ..."
 	  echo
-          git clone $coregit_url
-          mv $corename-core $corename
+          git clone $coregit_url $corename
           cd $corename
           git checkout $corebranch
           git checkout -b $archivebranch
           git cherry-pick e78ae5171b960cef5c035305f0881a9cdb60b2b5 4534346ce155a23bf12a3e10c2da0e19a14235a1
           git log -3
-	  cd $workspace/owncloud
+	  cd $workspace/$corename
 	  git submodule init
 	  git submodule update
 	  cd 3rdparty
 	  git checkout v8.2.1
-#          3rdparty
           echo
           logln "cloning core: $corename ... done"
       fi
+
       cd $workspace
     echo "============================================================================"
 }
