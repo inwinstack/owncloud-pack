@@ -10,7 +10,7 @@ In settings.ini, there are three main block and app block.
 Three main block including `[owner]`, `[pack]` and `[core]`.
 ```
 [owner]
-name=moe
+name=settings
 allapps=user_status_validator,user_permission,config_history,shared_session,activity_ext,show_all_activity,singlesignon,activity_logging,user_quota,sharing_group,ajax_event_dispatcher,gallery,activity,files_pdfviewer,files_texteditor,firstrunwizard,notifications,files_mv
 ```
 * `name` customer name.
@@ -20,7 +20,7 @@ allapps=user_status_validator,user_permission,config_history,shared_session,acti
 prefix=owncloud
 version=8.2.1
 ```
-* `prefix`: means directory name in tar file.
+* `prefix`: directory name in tar file.
 * `version`: owncloud version.  
 
 All parameter in core block does not need to modify.
@@ -29,37 +29,31 @@ All parameter in core block does not need to modify.
 name=owncloud
 branch=release-8.2.1
 archivebranch=archive/8.2.1
-flag=branch
 git_url=https://github.com/inwinstack/owncloud-core.git
 ```
 * `name`: owncloud core directory name.
 * `branch`: core branch name.
 * `archivebranch`: a branch used to pack.
-* `flag`: determine which kind of this branch, brnach or tag.
-* `git_url`: the url where can git clone owncloud core
+* `git_url`: the url where can git clone owncloud core.
 
-There are not only one app block in settings.ini file. There are two samples of app block below.  
+There are not only one app block in settings.ini file. There are two samples of apps block below.  
 ```
 [activity]
-sourcename=activity
-match=Yes
+name=activity
 branch=v8.2.1
 flag=tag
 git_url=https://github.com/owncloud/activity.git
 
 [config_history]
-sourcename=owncloud-config_history
-match=No
+name=config_history
 branch=v8.2.1
 flag=tag
 git_url=https://github.com/inwinstack/owncloud-config_history.git
 ```
-* `sourcename`: means app name git clone from git_url.
-* `match`: means whether the app name git clone from git_url equals to app block name. If match equals to Yes, it will not change app name. If match equals to No, it will change app name.
+* `name`: app name.
 * `branch`: apps branch name.
 * `flag`: determine which kind of this branch, branch or tag.
-* `git_url`: the url where can git clone app
-
+* `git_url`: the url where can git clone this app.
 
 # pack.sh File
 This **pack.sh** file will update your owncloud app to the latest according to **settings.ini** file.
@@ -69,3 +63,6 @@ Sample:
 Behind `--config` you have to input a specific ini file. Through `-v` you can see the detail result during udpate.
 
     ./pack.sh --config settings.ini -v
+
+#  After executing script
+You can find `owncloud-8.2.1.tar.bz2` you just pack according to your setting.ini file in `owncloud/.tmp/` directory.
