@@ -165,12 +165,45 @@ function owncloudcore(){
     echo "============================================================================"
 }
 
+function theme(){
+    name=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
+    use_theme=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/use_theme/{print $2;exit}' $CONFIGFILE)
+    flag=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/flag/{print $2;exit}' $CONFIGFILE)
+    branch=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/branch/{print $2;exit}' $CONFIGFILE)
+    git_url=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/git_url/{print $2;exit}' $CONFIGFILE)
+    if [ "$use_theme" == "Yes" ] || [ "$use_theme" == "yes" ]; then
+	echo -e "Use theme.\n"
+	cd owncloud/themes
+	if [ -d "$name" ]; then
+            echo -e "$name exists.\n"
+	    cd $name
+	    if [ "$flag" == "tag" ]; then
+                tupdate
+            elif [ "$flag" == "branch" ]; then
+                bupdate
+            fi
+        else
+            echo -e "$name does not exist.\n"
+            log "cloning $name ..."
+            echo
+            git clone $git_url $name
+            cd $name
+            git checkout $branch
+            logln "cloning $name ... done"
+	fi
+    else
+	echo "Do not use theme."
+    fi
+
+    cd $workspace
+}
+
 function pack(){
     prefix=$(awk -F '=' '/\['"pack"']/{a=1}a==1&&$1~/prefix/{print $2;exit}' $CONFIGFILE)
     version=$(awk -F '=' '/\['"pack"']/{a=1}a==1&&$1~/version/{print $2;exit}' $CONFIGFILE)
     cd owncloud
     if [ -d ".tmp" ]; then
-	echo -e "Remove origin .tmp/\n"
+        echo -e "Remove origin .tmp/\n"
         rm -rf .tmp/
         ./archive.sh --prefix $prefix --version $version -v
     else
@@ -181,4 +214,5 @@ function pack(){
 owncloudcore
 appclone
 appupdate
+theme
 pack
