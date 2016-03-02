@@ -138,8 +138,8 @@ function owncloudcore(){
 	  git branch -D $archivebranch
 	  git pull --rebase origin $corebranch
 	  git checkout -b $archivebranch
-          git cherry-pick e78ae5171b960cef5c035305f0881a9cdb60b2b5 4534346ce155a23bf12a3e10c2da0e19a14235a1
-	  git log -3
+          git cherry-pick 4534346ce155a23bf12a3e10c2da0e19a14235a1 e78ae5171b960cef5c035305f0881a9cdb60b2b5 e20bab33680177afda28e945f81169b507d3d3bd
+	  git log -4
 	  echo
 	  logln "updating core: $corename ... done"
       else
@@ -150,8 +150,8 @@ function owncloudcore(){
           cd $corename
           git checkout $corebranch
           git checkout -b $archivebranch
-          git cherry-pick e78ae5171b960cef5c035305f0881a9cdb60b2b5 4534346ce155a23bf12a3e10c2da0e19a14235a1
-          git log -3
+          git cherry-pick 4534346ce155a23bf12a3e10c2da0e19a14235a1 e78ae5171b960cef5c035305f0881a9cdb60b2b5 e20bab33680177afda28e945f81169b507d3d3bd
+          git log -4
 	  cd $workspace/$corename
 	  git submodule init
 	  git submodule update
@@ -199,16 +199,32 @@ function theme(){
 }
 
 function pack(){
+    themename=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
     prefix=$(awk -F '=' '/\['"pack"']/{a=1}a==1&&$1~/prefix/{print $2;exit}' $CONFIGFILE)
     version=$(awk -F '=' '/\['"pack"']/{a=1}a==1&&$1~/version/{print $2;exit}' $CONFIGFILE)
-    cd owncloud
-    if [ -d ".tmp" ]; then
-        echo -e "Remove origin .tmp/\n"
-        rm -rf .tmp/
-        ./archive.sh --prefix $prefix --version $version -v
+    use_theme=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/use_theme/{print $2;exit}' $CONFIGFILE)
+    if [ "$use_theme" == "Yes" ] || [ "$use_theme" == "yes" ]; then
+        cd owncloud
+        if [ -d ".tmp" ]; then
+            echo -e "Remove origin .tmp/\n"
+            rm -rf .tmp/
+            ./archive.sh --prefix $prefix --version $version --theme $themename -v
+        else
+            ./archive.sh --prefix $prefix --version $version --theme $themename -v
+        fi
     else
-        ./archive.sh --prefix $prefix --version $version -v
+        cd owncloud
+        if [ -d ".tmp" ]; then
+            echo -e "Remove origin .tmp/\n"
+            rm -rf .tmp/
+            ./archive.sh --prefix $prefix --version $version -v
+        else
+            ./archive.sh --prefix $prefix --version $version -v
+        fi
+
     fi
+    
+    cd $workspace
 }
 
 owncloudcore
