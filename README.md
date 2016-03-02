@@ -6,8 +6,8 @@ Place this two file in anywhere you want to pack owncloud.
 
 # settings.ini File
 One ini file for one customer. You can create another ini file based on **settings.ini** file.  
-In settings.ini, there are three main block and app block.  
-Three main block including `[owner]`, `[pack]` and `[core]`.
+In settings.ini, there are four main block and app block.  
+Four main block including `[owner]`, `[pack]`, `[core]` and `[theme]`.
 ```
 [owner]
 name=settings
@@ -34,7 +34,22 @@ git_url=https://github.com/inwinstack/owncloud-core.git
 * `name`: owncloud core directory name.
 * `branch`: core branch name.
 * `archivebranch`: a branch used to pack.
-* `git_url`: the url where can git clone owncloud core.
+* `git_url`: the url where can git clone owncloud core.  
+
+You have to keep theme block even though you do not want to use theme. If you don't want to use theme, just modify **use_theme** to **no**.
+```
+[theme]
+name=MOE
+use_theme=yes
+branch=master
+flag=branch
+git_url=https://github.com/inwinstack/owncloud-theme-moe.git
+```
+* `name`: theme name.
+* `use_theme`: whether you want to use theme.
+* `branch`: theme branch name.
+* `flag`: determine which kind of this branch, branch or tag.
+* `git_url`: the url where can git clone theme.
 
 There are not only one app block in settings.ini file. There are two samples of apps block below.  
 ```
