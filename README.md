@@ -36,7 +36,7 @@ git_url=https://github.com/inwinstack/owncloud-core.git
 * `archivebranch`: a branch used to pack.
 * `git_url`: the url where can git clone owncloud core.  
 
-You have to keep theme block even though you do not want to use theme. If you don't want to use theme, just modify **use_theme** to **no**.
+You have to keep `[theme]` block even though you do not want to use theme. If you don't want to use theme, just modify **use_theme** to **no**.
 ```
 [theme]
 name=MOE
