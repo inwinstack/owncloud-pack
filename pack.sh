@@ -152,7 +152,6 @@ function owncloudcore(){
           git checkout -b $archivebranch
           git cherry-pick 4534346ce155a23bf12a3e10c2da0e19a14235a1 e78ae5171b960cef5c035305f0881a9cdb60b2b5 e20bab33680177afda28e945f81169b507d3d3bd
           git log -4
-	  cd $workspace/$corename
 	  git submodule init
 	  git submodule update
 	  cd 3rdparty
