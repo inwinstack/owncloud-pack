@@ -57,6 +57,7 @@ function appupdate(){
 
     # get apps name in owner block
     profile=`sed -n '/allapps/'p $CONFIGFILE | awk -F= '{print $2}' | sed 's/,/ /g'`
+    owncloud_name=$(awk -F '=' '/\['"core"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
 
     # execute update
     for App in $profile
@@ -67,7 +68,7 @@ function appupdate(){
       echo -e "App: $App\tBranch: $branch\tflag: $flag\n"
       log "Updating app: $App ..."
       echo 
-      cd $workspace/owncloud/apps/$App
+      cd $workspace/$owncloud_name/apps/$App
 
       if [ "$flag" == "tag" ]; then
           tupdate
@@ -89,6 +90,7 @@ function appclone(){
 
     # get all apps name in owner block
     profile=`sed -n '/allapps/'p $CONFIGFILE | awk -F= '{print $2}' | sed 's/,/ /g'`
+    owncloud_name=$(awk -F '=' '/\['"core"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
 
     # execute clone
     for App in $profile
@@ -98,7 +100,7 @@ function appclone(){
       git_url=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/git_url/{print $2;exit}' $CONFIGFILE)
       appname=$(awk -F '=' '/\['"$App"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
       echo -e "App: $App\tUrl: $git_url\n"
-      cd $workspace/owncloud/apps/
+      cd $workspace/$owncloud_name/apps/
       
       if [ -d "$App" ]; then
           echo -e "$App exists.\n" 
@@ -165,6 +167,7 @@ function owncloudcore(){
 }
 
 function theme(){
+    owncloud_name=$(awk -F '=' '/\['"core"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
     name=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
     use_theme=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/use_theme/{print $2;exit}' $CONFIGFILE)
     flag=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/flag/{print $2;exit}' $CONFIGFILE)
@@ -172,7 +175,7 @@ function theme(){
     git_url=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/git_url/{print $2;exit}' $CONFIGFILE)
     if [ "$use_theme" == "Yes" ] || [ "$use_theme" == "yes" ]; then
 	echo -e "Use theme.\n"
-	cd owncloud/themes
+	cd $owncloud_name/themes
 	if [ -d "$name" ]; then
             echo -e "$name exists.\n"
 	    cd $name
@@ -195,15 +198,17 @@ function theme(){
     fi
 
     cd $workspace
+    echo "============================================================================"
 }
 
 function pack(){
+    owncloud_name=$(awk -F '=' '/\['"core"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
     themename=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
     prefix=$(awk -F '=' '/\['"pack"']/{a=1}a==1&&$1~/prefix/{print $2;exit}' $CONFIGFILE)
     version=$(awk -F '=' '/\['"pack"']/{a=1}a==1&&$1~/version/{print $2;exit}' $CONFIGFILE)
     use_theme=$(awk -F '=' '/\['"theme"']/{a=1}a==1&&$1~/use_theme/{print $2;exit}' $CONFIGFILE)
     if [ "$use_theme" == "Yes" ] || [ "$use_theme" == "yes" ]; then
-        cd owncloud
+        cd $owncloud_name
         if [ -d ".tmp" ]; then
             echo -e "Remove origin .tmp/\n"
             rm -rf .tmp/
@@ -212,7 +217,7 @@ function pack(){
             ./archive.sh --prefix $prefix --version $version --theme $themename -v
         fi
     else
-        cd owncloud
+        cd $owncloud_name
         if [ -d ".tmp" ]; then
             echo -e "Remove origin .tmp/\n"
             rm -rf .tmp/
@@ -226,8 +231,43 @@ function pack(){
     cd $workspace
 }
 
+function sso_copyfile(){
+    git clone $git_url $sso_name
+    cd $sso_name
+    git checkout $branch
+    cd $workspace
+    cp -r $sso_name/. $owncloud_name/apps/$singlesignon_name/lib/
+    cd $owncloud_name/apps/$singlesignon_name/lib/
+    rm -rf .git/
+    cd $workspace
+}
+
+function sso(){
+    use_sso=$(awk -F '=' '/\['"singlesignon"']/{a=1}a==1&&$1~/use_sso/{print $2;exit}' $CONFIGFILE)
+    owncloud_name=$(awk -F '=' '/\['"core"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
+    singlesignon_name=$(awk -F '=' '/\['"singlesignon"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
+    sso_name=$(awk -F '=' '/\['"sso"']/{a=1}a==1&&$1~/name/{print $2;exit}' $CONFIGFILE)
+    branch=$(awk -F '=' '/\['"sso"']/{a=1}a==1&&$1~/branch/{print $2;exit}' $CONFIGFILE)
+    git_url=$(awk -F '=' '/\['"sso"']/{a=1}a==1&&$1~/git_url/{print $2;exit}' $CONFIGFILE)        
+    cd $workspace
+    if [ "$use_sso" == "Yes" ] || [ "$use_sso" == "yes" ]; then
+        if [ -d "$sso_name" ]; then
+            echo "Delete $sso_name folder!"
+            rm -rf $sso_name/
+            sso_copyfile
+        else
+            sso_copyfile
+        fi
+    else
+        echo "Do not use sso!"
+        rm -rf $owncloud_name/apps/$singlesignon_name
+    fi
+    echo "============================================================================"
+}
+
 owncloudcore
 appclone
 appupdate
+sso
 theme
 pack
