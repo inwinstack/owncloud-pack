@@ -108,4 +108,4 @@ Behind `--config` you have to input a specific ini file. Through `-v` you can se
     ./pack.sh --config settings.ini -v
 
 #  After executing script
-You can find `owncloud-8.2.1.tar.bz2` you just pack according to your setting.ini file in `owncloud/.tmp/` directory.
+You can find `owncloud-8.2.1.tar.bz2` you just pack according to your settings.ini file in `owncloud/.tmp/` directory.
