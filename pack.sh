@@ -268,6 +268,6 @@ function sso(){
 owncloudcore
 appclone
 appupdate
-sso
+# sso
 theme
 pack
